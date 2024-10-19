@@ -1,10 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {
-  uploadReport,
-  getAllReports,
-  getFilteredReports,
-} = require("../controller/reportController");
+const { uploadReport, getReports } = require("../controller/reportController");
 const upload = require("../middleware/uploadMiddleware");
 const { validateUpload } = require("../middleware/validationMiddleware");
 const { createUser, loginUser } = require("../controller/userController");
@@ -24,13 +20,11 @@ router.post(
     { name: "detailExcel", maxCount: 1 },
     { name: "summaryExcel", maxCount: 1 },
   ]),
+  validateUpload,
   uploadReport
 );
 
 // Route for fetching all reports
-router.get("/reports", getAllReports);
-
-// Route for fetching filtered reports
-router.get("/reports/filter", getFilteredReports);
+router.get("/reports", getReports);
 
 module.exports = router;

@@ -25,26 +25,33 @@ exports.uploadReport = async (req, res) => {
 };
 
 // Get all reports handler
-exports.getAllReports = async (req, res) => {
-  try {
-    const reports = await Report.find();
-    res.status(200).json(reports);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to retrieve reports", error });
-  }
-};
-
-// Get filtered reports handler
-exports.getFilteredReports = async (req, res) => {
-  const { platform, month, year } = req.query;
+exports.getReports = async (req, res) => {
+  const {
+    platform,
+    month,
+    year,
+    sortMonth,
+    sortYear,
+    page = 1,
+    limit = 10,
+  } = req.query;
   const query = {};
+  const sort = {};
 
   if (platform) query.platform = platform;
   if (month) query.month = month;
   if (year) query.year = year;
 
+  if (sortMonth) sort.month = sortMonth === "asc" ? 1 : -1;
+  if (sortYear) sort.year = sortYear === "asc" ? 1 : -1;
+
+  const skip = (page - 1) * limit;
+
   try {
-    const reports = await Report.find(query);
+    const reports = await Report.find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(parseInt(limit));
     res.status(200).json(reports);
   } catch (error) {
     res.status(500).json({ message: "Failed to retrieve reports", error });
