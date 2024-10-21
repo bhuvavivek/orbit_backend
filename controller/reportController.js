@@ -32,6 +32,7 @@ exports.getReports = async (req, res) => {
     year,
     sortMonth,
     sortYear,
+    search,
     page = 1,
     limit = 10,
   } = req.query;
@@ -44,16 +45,30 @@ exports.getReports = async (req, res) => {
 
   if (sortMonth) sort.month = sortMonth === "asc" ? 1 : -1;
   if (sortYear) sort.year = sortYear === "asc" ? 1 : -1;
+  if (search && search.trim().length > 0) {
+    const regex = new RegExp(search, "i"); // 'i' for case-insensitive
+    query.$or = [{ platform: regex }, { month: regex }];
+    if (!isNaN(search)) {
+      query.$or.push({ year: Number(search) });
+    }
+  }
 
   const skip = (page - 1) * limit;
 
   try {
+    const totalCount = await Report.countDocuments(query);
     const reports = await Report.find(query)
       .sort(sort)
       .skip(skip)
       .limit(parseInt(limit));
-    res.status(200).json(reports);
+    res.status(200).json({
+      reports,
+      totalCount,
+      page: parseInt(page),
+      limit: parseInt(limit),
+    });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Failed to retrieve reports", error });
   }
 };
