@@ -3,7 +3,11 @@ const router = express.Router();
 const { uploadReport, getReports } = require("../controller/reportController");
 const upload = require("../middleware/uploadMiddleware");
 const { validateUpload } = require("../middleware/validationMiddleware");
-const { createUser, loginUser } = require("../controller/userController");
+const {
+  createUser,
+  loginUser,
+  changePassword,
+} = require("../controller/userController");
 const validateUser = require("../middleware/userMiddleware");
 const checkAuthToken = require("../middleware/authMiddleware");
 
@@ -13,6 +17,8 @@ router.get("/register", validateUser, createUser);
 // Login user
 router.post("/login", validateUser, loginUser);
 
+// change password
+router.post("/changePassword", checkAuthToken, changePassword);
 // Route for uploading the report
 
 router.post(

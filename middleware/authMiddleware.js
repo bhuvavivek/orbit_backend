@@ -3,6 +3,7 @@ const { JWT_SECRET } = process.env; // Ensure you have a secret key in your envi
 
 const checkAuthToken = (req, res, next) => {
   const token = req.headers["authorization"].split(" ")[1];
+
   if (!token) {
     return res.status(401).json({ message: "Authorization token is required" });
   }

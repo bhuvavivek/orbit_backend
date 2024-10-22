@@ -49,7 +49,15 @@ exports.getReports = async (req, res) => {
     const regex = new RegExp(search, "i"); // 'i' for case-insensitive
     query.$or = [{ platform: regex }, { month: regex }];
     if (!isNaN(search)) {
-      query.$or.push({ year: Number(search) });
+      query.$or.push({
+        $expr: {
+          $regexMatch: {
+            input: { $toString: "$year" },
+            regex: search,
+            options: "i",
+          },
+        },
+      });
     }
   }
 
